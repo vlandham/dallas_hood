@@ -1,0 +1,235 @@
+body {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.89em;
+}
+
+h1, h2 {
+  font-family: 'Acme', sans-serif;
+  /* font-weight: 700; */
+  font-size: 2.3em;
+  margin-bottom: 10px;
+	letter-spacing: -0.04em;
+  line-height: 1.1em;
+  text-transform: uppercase;
+  color: #222;
+}
+
+h1#title-top {
+  font-size: 2em;
+  width: 80%;
+  margin-left: 80px;
+}
+
+h3 {
+  font-family: 'Acme', sans-serif;
+  color: #D87D24;
+  padding: 0 0 10px 10px;
+}
+
+h3#title-compare {
+  color: #D5943D;
+  font-size: 1.3em;
+  text-transform: uppercase;
+}
+
+#wrapper {
+  margin: auto;
+  width: 700px;
+}
+
+#top-page-nav {
+  height: 40px;
+  background-color: #ddd;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+#main {
+  width: 620px;
+  float: left;
+  position: absolute;
+}
+
+#title-front {
+  color: #E98927;
+}
+
+#title-back {
+  color: #525252;
+}
+
+#vis-panel {
+  width: 395px;
+  float: left;
+}
+
+#map-panel {
+  width: 215px;
+  float: left;
+  padding-left: 10px;
+}
+
+#selectors {
+  /* height: 60px; */
+}
+
+#selectors-nav {
+  background-color: #FBE6C5;
+	width: 100%;
+	float: left;
+	margin: 0 0 3em 0;
+	padding: 0;
+	list-style: none;
+	/* background-color: #f2f2f2; */
+	/* border-bottom: 1px solid #ccc;  */
+	/* border-top: 1px solid #ccc;  */
+}
+
+#selectors-nav li {
+	float: left; 
+}
+
+#selectors-nav li a {
+	display: block;
+	padding: 8px 15px;
+	text-decoration: none;
+	font-weight: bold;
+	color: #069;
+	border-right: 1px solid #ccc; 
+  text-transform: uppercase;
+}
+
+#selectors-nav li a:hover {
+	color: #c00;
+	background-color: #fff; 
+}
+
+#map {
+  height: 290px;
+  background-color: #FBE6C5;
+  border: 1px solid #000;
+}
+
+#legend {
+  text-transform: uppercase;
+}
+
+#vis {
+  height: 205px;
+  border: 1px solid #000;
+}
+
+#name-section {
+  height: 40px;
+  background-color:#ddd;
+  margin-top: 20px;
+}
+
+
+path.line {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
+path.area {
+  fill: #e7e7e7;
+}
+
+.x_axis, .y_axis, .crosshair {
+  shape-rendering: crispEdges;
+}
+
+#crosshairs line {
+  fill: none;
+  stroke: #ddd;
+}
+
+.x_axis line, .x_axis path {
+  fill: none;
+  stroke: #000;
+}
+
+.y_axis line, .y_axis path {
+  fill: none;
+  stroke: #000;
+}
+
+#tooltip {
+    position: absolute;
+    /* left: 100px; */
+    /* top: 300px; */
+    width: 220px;
+    background: url(../img/black80.png);
+    z-index: 1338;
+    padding: 7px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    color: white;
+    -moz-box-shadow: 1px 1px 1px #666;
+    -webkit-box-shadow: 1px 1px 1px #666;
+    box-shadow: 1px 1px 1px #666;
+    pointer-events: none;
+}
+ 
+#tooltip.hidden {
+    display: none;
+}
+ 
+#tooltip .tri {
+    position: absolute;
+    bottom: -9px;
+    left: 100px;
+    width: 17px;
+    height: 9px;
+    background: url(../img/blacktri80c-down.png) no-repeat;
+}
+ 
+#tooltip .title {
+    font-size: 16px;
+    line-height: 18px;
+    margin-bottom: 9px;
+    text-align:center;
+}
+ 
+#tooltip .detail {
+    font-size: 12px;
+    line-height: 14px;
+    color: white;
+}
+ 
+#tooltip table {
+    width: 100%;
+    font-size: 12px;
+    line-height: 14px;
+    color: white;
+    margin:0;
+}
+ 
+#tooltip th, #tooltip td {
+    text-align: left;
+    border-top: 1px solid #666;
+    padding: 2px 0;
+}
+ 
+#tooltip table tr:first-child th {
+    border-top: none;
+    font-size: 12px;
+    line-height: 14px;
+}
+ 
+#tooltip table td.r {
+    text-align: right;
+}
+
+#box {
+    position: absolute;
+    background: gray;
+    opacity: 0.25;
+    pointer-events: none;
+    display: none;
+}
+ 
+#box.hidden {
+    display: none;
+}
