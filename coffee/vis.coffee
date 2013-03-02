@@ -9,13 +9,13 @@ $ ->
   # ---
   # These are constants we would like availible anywhere in the visualization
   # ---
-  width = 360
+  width = 340
   height = 175
   key_h = 20
   key_w = 390
   key_margin_left = 0
   [key_pt, key_pr, key_pb, key_pl] = [10, 10, 10, 15]
-  [pt, pr, pb, pl] = [10, 15, 25, 30]
+  [pt, pr, pb, pl] = [10, 22, 25, 33]
 
   # ---
   # default options
@@ -70,8 +70,8 @@ $ ->
   # !!!
   # here is the text used for the labels on the main chart
   # !!!
-  y_label = "y label"
-  x_label = "x label"
+  y_label = ""
+  x_label = ""
 
   # !!!
   # functions to acess values of data used for scales
@@ -199,7 +199,9 @@ $ ->
     x_padding = if x_padding > min_x_padding then x_padding else min_x_padding
 
     min_x = min_x - x_padding
+    min_x = if min_x < 0 then 0 else min_x
     max_x = max_x + x_padding
+    max_x = if max_x > 100 then 100 else max_x
 
     x_scale.domain([min_x, max_x])
     y_scale.domain([min_y, max_y])
