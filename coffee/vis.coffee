@@ -28,7 +28,8 @@ $ ->
   # so people could link to specific sorts/filters
   #
   # ---
-  root.options = {top: 50, bottom: 0, genres: null, year: "all", stories: null, sort:"overall", display_id:"schools_index"}
+  # root.options = {top: 50, bottom: 0, genres: null, year: "all", stories: null, sort:"overall", show:"schools_index"}
+  root.options = {sort:"overall", show:"schools_index"}
 
   ranges = {
     overall_score: [-1.7, 0.7]
@@ -81,7 +82,7 @@ $ ->
   # !!!
   id = (d) -> d["name"]
   x = (d) -> d["overall_score"]
-  y = (d) -> d[root.options.display_id]
+  y = (d) -> d[root.options.show]
 
   # r = (d) -> d["population"]
   r = (d) -> 6
@@ -160,15 +161,15 @@ $ ->
     bottom_start_index = data.length - bottom
     bottom_start_index = 0 if bottom_start_index < 0
 
-    if top >= bottom_start_index
-      data = data
-    else
-      top_data = data[0...top]
-      bottom_data = data[bottom_start_index..-1]
-      data = d3.merge([top_data, bottom_data])
+    # if top >= bottom_start_index
+    #   data = data
+    # else
+    #   top_data = data[0...top]
+    #   bottom_data = data[bottom_start_index..-1]
+    #   data = d3.merge([top_data, bottom_data])
 
-  set_display = (display_id) ->
-    y  = (d) -> d[display_id]
+  set_display = (show) ->
+    y  = (d) -> d[show]
 
   # ---
   # updates x and y scales to conform to newly 
@@ -213,13 +214,13 @@ $ ->
   # updates scales
   # ---
   update_data = () =>
-    set_display(root.options.display_id)
+    set_display(root.options.show)
     data = all_data
     filter_year(root.options.year)
     filter_genres(root.options.genres)
     filter_stories(root.options.stories)
     sort_data(root.options.sort)
-    filter_number(root.options.top, root.options.bottom)
+    # filter_number(root.options.top, root.options.bottom)
     update_scales()
 
   # ---
@@ -291,17 +292,17 @@ $ ->
   # updates the lower 'details' section
   # ---
   draw_details = () ->
-    if root.options.top == 0
-      $("#detail-love").hide()
-    else
-      $("#detail-love").show()
+    # if root.options.top == 0
+    #   $("#detail-love").hide()
+    # else
+    #   $("#detail-love").show()
 
     if root.options.bottom == 0
       $("#detail-hate").hide()
     else
       $("#detail-hate").show()
 
-    top_data = data[0...root.options.top]
+    # top_data = data[0...root.options.top]
 
     detail_top = d3.select("#detail-love").selectAll(".bubble-detail")
       .data(top_data, (d) -> id(d))
@@ -460,7 +461,7 @@ $ ->
       .attr("id", "bubbles")
 
     draw_bubbles()
-    draw_details()
+    # draw_details()
     draw_key()
 
   # ---
@@ -545,12 +546,14 @@ $ ->
   update = () =>
     update_data()
     draw_bubbles()
-    draw_details()
+    # draw_details()
 
   d3.selectAll("#selectors a").on "click", (e) ->
     found_id = d3.select(this).attr("id")
-    display_id = "#{found_id}_index"
-    root.options.display_id = display_id
+    show = "#{found_id}_index"
+    root.options.show = show
+    encoded = rison.encode(root.options)
+    document.location.hash = encoded
     update()
     d3.event.preventDefault()
 
