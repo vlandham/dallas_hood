@@ -14,6 +14,7 @@
 
     <link href='http://fonts.googleapis.com/css?family=Josefin+Slab:700|Josefin+Sans|Acme' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/typeahead.min.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/libs/modernizr-2.6.2.min.js"></script>
   </head>
@@ -28,6 +29,9 @@
         <div id="vis-panel">
           <h1 id="title-top"><span id="title-front">Neighborhood Matrix:</span> <span id="title-back">By The Numbers</span></h1>
           <div class="clearfix"></div>
+          <!-- <div id="search-panel"> -->
+          <!--   <input type="text" autocomplete="off" class="name-search"> -->
+          <!-- </div> -->
           <div id="vis">
           </div>
           <div id="tooltip" class="hidden">
@@ -59,6 +63,56 @@
             <li><a id="go_do" href="#">Activities</a></li>
           </ul>
         </div>
+        <div id="details-section">
+          <div class="detail" id="detail_overall_score">
+            <h3>Overall Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_schools_index">
+            <h3>School Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_safety_index">
+            <h3>Safety Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_appreciation_index">
+            <h3>Appreciation Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_affordability_index">
+            <h3>Affordability Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_parks_index">
+            <h3>Parks Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_commute_index">
+            <h3>Commute Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_pet_index">
+            <h3>Pet Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_walkability_index">
+            <h3>Walkability Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_landscaping_index">
+            <h3>Landscaping Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_quiet_index">
+            <h3>Quiet Score</h3>
+            <h4 class="score"></h4>
+          </div>
+          <div class="detail" id="detail_go_do_index">
+            <h3>Go Do Score</h3>
+            <h4 class="score"></h4>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -67,6 +121,7 @@
       <script defer src="js/plugins.js"></script>
       <script src="js/libs/coffee-script.js"></script>
       <script src="js/libs/rison.js"></script>
+      <script src="js/libs/typeahead.min.js"></script>
       <script src="js/libs/d3.v3.min.js"></script>
       <script type="text/coffeescript" src="coffee/vis.coffee"></script>
 

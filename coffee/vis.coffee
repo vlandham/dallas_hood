@@ -17,6 +17,8 @@ $ ->
   [key_pt, key_pr, key_pb, key_pl] = [10, 10, 10, 15]
   [pt, pr, pb, pl] = [10, 22, 25, 33]
 
+  previous_id = null
+
   # ---
   # default options
   #
@@ -29,7 +31,26 @@ $ ->
   #
   # ---
   # root.options = {top: 50, bottom: 0, genres: null, year: "all", stories: null, sort:"overall", show:"schools_index"}
-  root.options = {sort:"overall", show:"schools_index"}
+  #
+  #
+
+  root.options = {}
+
+  update_hash = () =>
+    encoded = rison.encode(root.options)
+    document.location.hash = encoded
+
+
+  update_options = () =>
+    loaded_options = {}
+    if document.location.hash
+      loaded_options = rison.decode(document.location.hash.replace(/^#/,""))
+    else
+      loaded_options = {}
+    root.options = {}
+    root.options['id'] = loaded_options['id'] or "Kansas City"
+    root.options['show'] = loaded_options['show'] or "schools_index"
+    # root.options = {id:"Kansas City", show:"schools_index"}
 
   ranges = {
     overall_score: [-1.7, 0.7]
@@ -52,8 +73,8 @@ $ ->
   sort_key = {
     overall: "overall_score",
     schools: "schools_index",
-    rating: "Rotten Tomatoes",
     population: "population"
+    distance: 'distance'
   }
 
   # ---
@@ -61,6 +82,7 @@ $ ->
   # ---
   data = null
   all_data = null
+  data_by_id = {}
   base_vis = null
   vis = null
   body = null
@@ -85,7 +107,7 @@ $ ->
   y = (d) -> d[root.options.show]
 
   # r = (d) -> d["population"]
-  r = (d) -> 6
+  r = (d) -> d
   color = (d) -> d["county"]
 
 
@@ -100,7 +122,7 @@ $ ->
   # will need to be changed
   # !!!
   # r_scale = d3.scale.sqrt().range([0, 29]).domain([0,310])
-  r_scale = (d) -> 10
+  r_scale = (d) -> if id(d) == root.options.id then 18 else 10
 
   xAxis = d3.svg.axis().scale(x_scale).tickSize(5).tickSubdivide(true)
   yAxis = d3.svg.axis().scale(y_scale_reverse).ticks(5).orient("left")
@@ -111,7 +133,14 @@ $ ->
   # if we have more/less colors we can change them here 
   # !!!
   color_scale = d3.scale.category10()
-  color_scale = d3.scale.ordinal().range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#078B78", "#5C1509", "#CECECE", "#FFEA0A"])
+  color_scale = d3.scale.ordinal().range(["#1f77b4", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#078B78", "#5C1509", "#CECECE", "#FFEA0A"])
+
+  get_color = (d) =>
+    if id(d) == root.options.id
+      "#ff7f0e"
+    else
+      color_scale(color(d))
+
 
   # ---
   # Function used to ensure our raw data is in the correct format for the rest
@@ -129,8 +158,12 @@ $ ->
     data.forEach (d) ->
       d3.entries(scales).forEach (entry) ->
         d[entry.key] = entry.value(parseFloat(d[entry.key]))
-    console.log(data)
     data
+
+  prepare_data_by_id = (data) ->
+    data_by_id = {}
+    data.forEach (d) ->
+      data_by_id[id(d)] = d
 
   # ---
   # Sorts underlying data based on input sort_key key
@@ -139,7 +172,7 @@ $ ->
     data = data.sort (a,b) ->
       b1 = parseFloat(a[sort_key[sort_type]]) ? 0
       b2 = parseFloat(b[sort_key[sort_type]]) ? 0
-      b2 - b1
+      b1 - b2
 
   # ---
   # Various filters
@@ -161,12 +194,36 @@ $ ->
     bottom_start_index = data.length - bottom
     bottom_start_index = 0 if bottom_start_index < 0
 
+
     # if top >= bottom_start_index
     #   data = data
     # else
     #   top_data = data[0...top]
     #   bottom_data = data[bottom_start_index..-1]
     #   data = d3.merge([top_data, bottom_data])
+    
+  filter_count = (count) ->
+    data = data[0...count]
+    console.log(data[0])
+
+  distance_between = (n1, n2) ->
+    xs = n1.x - n2.x
+    ys = n1.y - n2.y
+    Math.sqrt((xs * xs) + (ys * ys))
+
+
+  update_distances = (new_id) =>
+    if new_id != previous_id
+      previous_id = new_id
+      centered_on = data_by_id[new_id]
+      if centered_on
+        data.forEach (d) ->
+          d.distance = distance_between(centered_on, d)
+          if d.name == centered_on.name
+            console.log(d.distance)
+      else
+        console.log("no index for #{new_id}")
+
 
   set_display = (show) ->
     y  = (d) -> d[show]
@@ -187,7 +244,6 @@ $ ->
     # console.log('y: ' + min_y + ' - ' + max_y)
     y_padding = parseInt(Math.abs(max_y - min_y) / 5)
     y_padding = if y_padding > min_y_padding then y_padding else min_y_padding
-    console.log(y_padding)
 
     [min_r, max_r] = d3.extent data, (d) -> parseFloat(r(d))
 
@@ -214,12 +270,15 @@ $ ->
   # updates scales
   # ---
   update_data = () =>
-    set_display(root.options.show)
     data = all_data
-    filter_year(root.options.year)
-    filter_genres(root.options.genres)
-    filter_stories(root.options.stories)
-    sort_data(root.options.sort)
+    set_display(root.options.show)
+    update_distances(root.options.id)
+    # filter_year(root.options.year)
+    # filter_genres(root.options.genres)
+    # filter_stories(root.options.stories)
+    # sort_data(root.options.sort)
+    sort_data('distance')
+    filter_count(20)
     # filter_number(root.options.top, root.options.bottom)
     update_scales()
 
@@ -230,20 +289,24 @@ $ ->
     bubbles = vis_g.selectAll(".bubble")
       .data(data, (d) -> id(d))
 
-    bubbles.enter().append("g")
+    bubbles.enter()
+      .append("circle")
       .attr("class", "bubble")
       .on("mouseover", (d, i) -> show_details(d,i,this))
       .on("mouseout", hide_details)
-    .append("circle")
+      .on("click", reselect)
       .attr("opacity", 0.85)
-      .attr("fill", (d) -> color_scale(color(d)))
-      .attr("stroke", (d) -> d3.hsl(color_scale(color(d))).darker())
+      .attr("fill", (d) -> get_color(d))
+      .attr("stroke", (d) -> d3.hsl(get_color(d)).darker())
       .attr("stroke-width", 2)
-      .attr("r", (d) -> r_scale(r(d)))
-
+      .attr("r", 0)
+      
     bubbles.transition()
       .duration(1000)
       .attr("transform", (d) -> "translate(#{x_scale(x(d))},#{y_scale(y(d))})")
+      .attr("r", (d) -> r_scale(r(d)))
+      .attr("fill", (d) -> get_color(d))
+      .attr("stroke", (d) -> d3.hsl(get_color(d)).darker())
 
     base_vis.transition()
       .duration(1000)
@@ -276,17 +339,17 @@ $ ->
   # helper function to create 
   # the detail listings for movies
   # ---
-  draw_movie_details = (detail_div) ->
-    detail_div.enter().append("div")
-      .attr("class", "bubble-detail")
-      .attr("id", (d) -> "bubble-detail-#{id(d)}")
-    .append("h3")
-      .text((d) -> d["Film"])
-    .append("span")
-      .attr("class", "detail-rating")
-      .text((d) -> " #{d["Rotten Tomatoes"]}%")
+  # draw_movie_details = (detail_div) ->
+  #   detail_div.enter().append("div")
+  #     .attr("class", "bubble-detail")
+  #     .attr("id", (d) -> "bubble-detail-#{id(d)}")
+  #   .append("h3")
+  #     .text((d) -> d["Film"])
+  #   .append("span")
+  #     .attr("class", "detail-rating")
+  #     .text((d) -> " #{d["Rotten Tomatoes"]}%")
 
-    detail_div.exit().remove()
+  #   detail_div.exit().remove()
 
   # ---
   # updates the lower 'details' section
@@ -394,10 +457,10 @@ $ ->
   # ---
   # Creates initial framework for visualization
   # ---
-  render_vis = (error, csv) ->
-    if error
-      console.log(error)
+  render_vis = (csv) ->
+    update_options()
     all_data = prepare_data(csv)
+    prepare_data_by_id(all_data)
     update_data()
 
     base_vis = d3.select("#vis")
@@ -460,9 +523,15 @@ $ ->
     vis_g = body.append("g")
       .attr("id", "bubbles")
 
-    draw_bubbles()
+    # draw_bubbles()
     # draw_details()
     draw_key()
+
+  reselect = (data, index) ->
+    root.options.id = id(data)
+    hide_details()
+    update_hash()
+
 
   # ---
   # function that is called when a bubble is 
@@ -482,7 +551,7 @@ $ ->
     msg += '<table>'
     msg += '<tr><td>Overall Score:</td><td>' +  bubble_data["overall_score"] + '</td></tr>'
     msg += '<tr><td>Population:</td><td>' +  bubble_data["population"] + '</td></tr>'
-    msg += '<tr><td>Worldwide Gross:</td><td>' +  bubble_data["Worldwide Gross"] + ' mil</td></tr>'
+    msg += '<tr><td>Distance:</td><td>' +  bubble_data["distance"] + '</td></tr>'
     msg += '<tr><td>Profit:</td><td>' +  bubble_data["Profit"] + ' mil' + '</td></tr>'
     msg += '<tr><td>Story:</td><td>' +  bubble_data["Story"] + '</td></tr>'
     msg += '</table>'
@@ -532,35 +601,73 @@ $ ->
 
     body.select("#crosshairs").remove()
 
+  update_content = () =>
+    current_selection = data_by_id[root.options.id]
+    if !current_selection
+      current_selection = all_data[0]
+    d3.select('#name-section')
+      .html("<h3>#{current_selection.name}</h3>")
+
+    d3.keys(ranges).forEach (k) ->
+      score = current_selection[k]
+      detail = d3.select("#detail_#{k}")
+      detail.select(".score").html(toFixed(score, 0) + "%")
+    
 # ---
 # MAIN
 # ---
      
-  # load the data then call render_vis
-  d3.csv "data/web_data_fakenames_utf.csv", render_vis
 
   # ---
   # Entry point for updating the visualization
   # called by update_options
   # ---
   update = () =>
+    update_options()
+    console.log(root.options)
     update_data()
     draw_bubbles()
+    update_content()
     # draw_details()
+    #
+  hashchange = () ->
+    console.log('update')
+    update()
+
+  d3.select(window)
+    .on("hashchange", hashchange)
 
   d3.selectAll("#selectors a").on "click", (e) ->
     found_id = d3.select(this).attr("id")
     show = "#{found_id}_index"
     root.options.show = show
-    encoded = rison.encode(root.options)
-    document.location.hash = encoded
-    update()
+    update_hash()
     d3.event.preventDefault()
+
+  setup_vis = (error, data) ->
+    if error
+      console.log(error)
+    render_vis(data)
+    update()
+    # names = d3.keys(data_by_id)
+    # $('input.name-search').change () ->
+    #   console.log($(this).text)
+    # $('.name-search').typeahead({
+    #   name: 'names'
+    #   local: names
+    #   limit: 10
+    # })
+
+  
+
+  # load the data then call 
+  d3.csv "data/web_data_fakenames_utf.csv", setup_vis
+
 
   # ---
   # UI accessible update function
   # ---
-  root.update_options = (new_options) =>
-    root.options = $.extend({}, root.options, new_options)
-    update()
+  # root.update_options = (new_options) =>
+  #   root.options = $.extend({}, root.options, new_options)
+  #   update()
 
