@@ -542,18 +542,18 @@ $ ->
 
     bBox = element.getBBox()
     box = { "height": Math.round(bBox.height), "width": Math.round(bBox.width), "x": width + bBox.x, "y" : height + bBox.y}
-    box.x = Math.round(x_scale(x(bubble_data)))  - (pr+109) + r_scale(r(bubble_data))
-    box.y = Math.round(y_scale_reverse(y(bubble_data))) - (r_scale(r(bubble_data)) + pt + 20)
+    box.x = Math.round(x_scale(x(bubble_data)))  - (pr+162) + r_scale(r(bubble_data))
+    box.y = Math.round(y_scale_reverse(y(bubble_data))) - (r_scale(r(bubble_data)) + pt - 65)
 
     tooltipWidth = parseInt(d3.select('#tooltip').style('width').split('px').join(''))
 
     msg = '<p class="title">' + bubble_data["name"] + '</p>'
     msg += '<table>'
-    msg += '<tr><td>Overall Score:</td><td>' +  bubble_data["overall_score"] + '</td></tr>'
-    msg += '<tr><td>Population:</td><td>' +  bubble_data["population"] + '</td></tr>'
-    msg += '<tr><td>Distance:</td><td>' +  bubble_data["distance"] + '</td></tr>'
-    msg += '<tr><td>Profit:</td><td>' +  bubble_data["Profit"] + ' mil' + '</td></tr>'
-    msg += '<tr><td>Story:</td><td>' +  bubble_data["Story"] + '</td></tr>'
+    msg += '<tr><td>Overall Score:</td><td>' +  toFixed(bubble_data["overall_score"],0) + '</td></tr>'
+    msg += '<tr><td>Population:</td><td>' +  addCommas(bubble_data["population"]) + '</td></tr>'
+    msg += '<tr><td>Distance:</td><td>' +  toFixed(bubble_data["distance"], 3) + '</td></tr>'
+    # msg += '<tr><td>Profit:</td><td>' +  bubble_data["Profit"] + ' mil' + '</td></tr>'
+    # msg += '<tr><td>Story:</td><td>' +  bubble_data["Story"] + '</td></tr>'
     msg += '</table>'
 
     d3.select('#tooltip').classed('hidden', false)
