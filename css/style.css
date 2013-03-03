@@ -104,6 +104,11 @@ h3#title-compare {
 	background-color: #fff; 
 }
 
+#selectors-nav li a.active {
+	color: #c00;
+	background-color: #fff; 
+}
+
 #map {
   height: 290px;
   background-color: #FBE6C5;

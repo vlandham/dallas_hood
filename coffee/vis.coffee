@@ -90,6 +90,9 @@ $ ->
   zero_line = null
   middle_line = null
 
+  map = null
+  map_makers_by_id = {}
+
   # !!!
   # here is the text used for the labels on the main chart
   # !!!
@@ -292,7 +295,9 @@ $ ->
     bubbles.enter()
       .append("circle")
       .attr("class", "bubble")
-      .on("mouseover", (d, i) -> show_details(d,i,this))
+      .on "mouseover", (d, i) ->
+        show_details(d,i,this)
+        highlight_on_map(d)
       .on("mouseout", hide_details)
       .on("click", reselect)
       .attr("opacity", 0.85)
@@ -354,28 +359,28 @@ $ ->
   # ---
   # updates the lower 'details' section
   # ---
-  draw_details = () ->
+  # draw_details = () ->
     # if root.options.top == 0
     #   $("#detail-love").hide()
     # else
     #   $("#detail-love").show()
 
-    if root.options.bottom == 0
-      $("#detail-hate").hide()
-    else
-      $("#detail-hate").show()
+    # if root.options.bottom == 0
+    #   $("#detail-hate").hide()
+    # else
+    #   $("#detail-hate").show()
 
-    # top_data = data[0...root.options.top]
+    # # top_data = data[0...root.options.top]
 
-    detail_top = d3.select("#detail-love").selectAll(".bubble-detail")
-      .data(top_data, (d) -> id(d))
+    # detail_top = d3.select("#detail-love").selectAll(".bubble-detail")
+    #   .data(top_data, (d) -> id(d))
 
-    # draw_movie_details(detail_top)
+    # # draw_movie_details(detail_top)
 
-    bottom_data = data[root.options.top..-1].reverse()
+    # bottom_data = data[root.options.top..-1].reverse()
 
-    detail_bottom = d3.select("#detail-hate").selectAll(".bubble-detail")
-      .data(bottom_data, (d) -> id(d))
+    # detail_bottom = d3.select("#detail-hate").selectAll(".bubble-detail")
+    #   .data(bottom_data, (d) -> id(d))
 
     # draw_movie_details(detail_bottom)
 
@@ -601,6 +606,54 @@ $ ->
 
     body.select("#crosshairs").remove()
 
+
+  # expects all_data to be valid
+  # and maybe data_by_id
+  # NOT CLEAN
+  highlight_on_map = (bubble_data) ->
+    if bubble_data.marker
+      # map.zoomIn(12)
+      # map.panTo(bubble_data.marker.getLatLng())
+      latlon = bubble_data.marker.getLatLng()
+      offset = map._getNewTopLeftPoint(latlon).subtract(map._getTopLeftPoint())
+      map.panBy(offset)
+      bubble_data.marker.openPopup()
+
+  setup_map = () =>
+    map_height = 290
+    map_width = 215
+    map = L.map('map').setView([32.889, -96.74653], 12)
+    api_key = "088d3df822cb4b33b9d95e9cedf889a5"
+    L.tileLayer("http://{s}.tile.cloudmade.com/#{api_key}/997/256/{z}/{x}/{y}.png")
+      .addTo(map)
+
+    d3.entries(data_by_id).forEach (entry) ->
+      d = entry.value
+      if d['y'] and d['x']
+        d.ll = new L.LatLng(d['y'],d['x'])
+      if d.ll
+        d.marker = new L.Marker(d.ll, {title:d.name})
+        d.marker.bindPopup(d.name)
+        d.marker.addTo(map)
+
+    if data_by_id[root.options.id].marker
+      highlight_on_map(data_by_id[root.options.id])
+
+      
+
+  update_index_nav = () =>
+    current_show = root.options.show
+    if !current_show
+      current_show = 'schools_index'
+    nav_id = "#" + current_show.replace("_index", "")
+    console.log(nav_id)
+
+    d3.selectAll("#selectors-nav li a").classed("active", false)
+    d3.select(nav_id).classed("active", true)
+
+
+
+
   update_content = () =>
     current_selection = data_by_id[root.options.id]
     if !current_selection
@@ -624,7 +677,7 @@ $ ->
   # ---
   update = () =>
     update_options()
-    console.log(root.options)
+    update_index_nav()
     update_data()
     draw_bubbles()
     update_content()
@@ -648,6 +701,7 @@ $ ->
     if error
       console.log(error)
     render_vis(data)
+    setup_map()
     update()
     # names = d3.keys(data_by_id)
     # $('input.name-search').change () ->
