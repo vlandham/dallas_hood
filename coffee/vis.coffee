@@ -48,7 +48,7 @@ $ ->
     else
       loaded_options = {}
     root.options = {}
-    root.options['id'] = loaded_options['id'] or "Kansas City"
+    root.options['id'] = loaded_options['id'] or "Irving"
     root.options['show'] = loaded_options['show'] or "schools_index"
     # root.options = {id:"Kansas City", show:"schools_index"}
 
