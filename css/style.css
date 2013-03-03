@@ -127,7 +127,19 @@ h3#title-compare {
 #name-section {
   height: 40px;
   background-color:#ddd;
+  padding-top: 20px;
   margin-top: 20px;
+}
+
+
+#name-section span {
+  height: 100%;
+  color: #D5943D;
+  font-size: 28px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 20px;
+  /* text-transform: uppercase; */
 }
 
 .detail {

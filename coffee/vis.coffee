@@ -658,8 +658,12 @@ $ ->
     current_selection = data_by_id[root.options.id]
     if !current_selection
       current_selection = all_data[0]
-    d3.select('#name-section')
-      .html("<h3>#{current_selection.name}</h3>")
+    d3.select('#name-section-name')
+      .html("#{current_selection.name}")
+    d3.select('#name-section-city')
+      .html("#{current_selection.city}")
+    d3.select('#name-section-county')
+      .html("#{current_selection.county}")
 
     d3.keys(ranges).forEach (k) ->
       score = current_selection[k]
